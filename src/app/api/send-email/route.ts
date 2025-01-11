@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-export async function POST(req) {
+export async function POST(req: Request) {
   const { name, email, message } = await req.json();
 
   const transporter = nodemailer.createTransport({
