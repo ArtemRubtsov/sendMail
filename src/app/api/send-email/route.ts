@@ -17,10 +17,11 @@ export async function POST(req: Request) {
 
   try {
     await transporter.sendMail({
-      from: `"${name}" <${email}>`, 
-      to: process.env.EMAIL_USER, 
-      subject: "Новое сообщение от пользователя", 
-      text: message, 
+      // from: `"${name}" <${email}>`, 
+      from: process.env.EMAIL_USER, 
+      to: process.env.RECIPIENT_EMAIL, 
+      subject: "New Message", 
+      text: `<p>${message} ${name} ${email}</p>`, 
     });
 
     return new Response(JSON.stringify({ message: "Email отправлен!" }), {
