@@ -1,32 +1,47 @@
 import nodemailer from "nodemailer";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
 dotenv.config();
 
 export async function POST(req: Request) {
-  const { name, email, message } = await req.json();
-
-  const transporter = nodemailer.createTransport({
-    service: "gmail", 
-    // secure: true,
-    auth: {
-      user: process.env.EMAIL_USER, 
-      pass: process.env.EMAIL_PASSWORD, 
-    },
-  });
-
   try {
-    await transporter.sendMail({
-      // from: `"${name}" <${email}>`, 
-      from: process.env.EMAIL_USER, 
-      to: process.env.RECIPIENT_EMAIL, 
-      subject: "New Message", 
-      text: `<p>${message} ${name} ${email}</p>`, 
+    const { name, email, message, specialist, date, time } = await req.json();
+
+    if (!name || !email || !message || !specialist || !date || !time) {
+      return new Response(
+        JSON.stringify({ message: "Все поля обязательны для заполнения." }),
+        { status: 400 }
+      );
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
+      },
     });
 
-    return new Response(JSON.stringify({ message: "Email отправлен!" }), {
-      status: 200,
+    const emailContent = `
+      <p>Сообщение от: ${name}</p>
+      <p>Email: ${email}</p>
+      <p>Выбранный специалист: ${specialist}</p>
+      <p>Дата: ${date}</p>
+      <p>Время: ${time}</p>
+      <p>Сообщение: ${message}</p>
+    `;
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: process.env.RECIPIENT_EMAIL,
+      subject: "Новая заявка на запись",
+      html: emailContent,
     });
+
+    return new Response(
+      JSON.stringify({ message: "Email успешно отправлен!" }),
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Ошибка отправки email:", error);
     return new Response(
@@ -35,3 +50,4 @@ export async function POST(req: Request) {
     );
   }
 }
+
