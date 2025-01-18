@@ -5,9 +5,9 @@ dotenv.config();
 
 export async function POST(req: Request) {
   try {
-    const { name, email, message, specialist, date, time, phone } = await req.json();
+    const { name, phone } = await req.json();
 
-    if (!name || !email || !message || !specialist || !date || !time || !phone) {
+    if (!name || !phone) {
       return new Response(
         JSON.stringify({ message: "Все поля обязательны для заполнения." }),
         { status: 400 }
@@ -24,12 +24,7 @@ export async function POST(req: Request) {
 
     const emailContent = `
       <p>Сообщение от: ${name}</p>
-      <p>Email: ${email}</p>
       <p>Email: ${phone}</p>
-      <p>Выбранный специалист: ${specialist}</p>
-      <p>Дата: ${date}</p>
-      <p>Время: ${time}</p>
-      <p>Сообщение: ${message}</p>
     `;
 
     await transporter.sendMail({
@@ -51,4 +46,3 @@ export async function POST(req: Request) {
     );
   }
 }
-
